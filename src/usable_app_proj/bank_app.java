@@ -26,7 +26,7 @@ public class bank_app {
 	static ArrayList<Client> clientList = new ArrayList<Client>();
 	
 	public static void main(String[] args) {
-		String pathToFile = "D:\\JAVA_proj\\client.csv";
+		String pathToFile = "D:\\Eclipse\\workspace\\bank_app\\client.csv";
 		createClientList(pathToFile);
 		clientList.get(0).balance=65;
 		//System.out.println(clientList.get(0).balance);
@@ -45,6 +45,25 @@ public class bank_app {
 			for (int i=1; i<lines.size(); i++) {
 				String[] lineArr = lines.get(i).split(SEPARATOR);
 				clientList.add(new Client(lineArr[0],lineArr[1], Integer.parseInt(lineArr[2]), Integer.parseInt(lineArr[3])));
+			}
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
+	
+	public static void fillClientObj (String filePath) {
+		Path pathObject = Paths.get(filePath);
+		Charset charset = Charset.forName("UTF-8");
+		try {
+			List<String> lines = Files.readAllLines(pathObject, charset);
+			for (int i=1; i<lines.size(); i++) {
+				String[] lineArr = lines.get(i).split(SEPARATOR);
+				clientList.get(i).password = lineArr[5];
+				clientList.get(i).balance = Integer.parseInt(lineArr[6]); //pars jāuzliek visiem skaitļiem
+				clientList.get(i).lastDeposit = Integer.parseInt(lineArr[7]);
+				clientList.get(i).lastWithdrawal = Integer.parseInt(lineArr[8]);
+				//clientList.get(i).transHistLast5 =lineArr[9]; kad aizpildīsies šī šūna exc jāskatās kā to var nolasīt, jo būs jau str masīvs vai pat masīvs nebūs
+				//clientList.add(new Client(lineArr[0],lineArr[1], Integer.parseInt(lineArr[2]), Integer.parseInt(lineArr[3])));
 			}
 		} catch (IOException e) {
 			System.out.println(e);
@@ -260,12 +279,13 @@ public class bank_app {
 							jāpārbauda vai vispār tā strādā !!!!!!!
 							esošais variants nestrādā
 							*/ 
-						}/*if (!(clientList.get(i).transHistLast5[j] == 0)) {
-							clientList.get(i).transHistLast5[0] = withdrawal * -1;
+						}if (!(clientList.get(i).transHistLast5[j] == 0)) {
 							for (int a=1; a<clientList.get(i).transHistLast5.length-1;a++) {
 								clientList.get(i).transHistLast5[a] = clientList.get(i).transHistLast5[a-1];
 							}
-						}*/
+							clientList.get(i).transHistLast5[0] = withdrawal * -1;
+							
+						}
 					}
 					break;
 				} else {
@@ -370,8 +390,9 @@ public class bank_app {
 		}
 		return isUserTrue;
 	}
-
+//logout() jāizveido, ka papildina tabulu ar jaunajiem datiem pirms visas pārējās darbības tiek izdarītas
 	public static void logout() {
+		//tie ies metode, kas papildina exc tabulu, tikai jāatrod, ka jau esošai var tikai vajadzīgās šūnas papildināt
 		activeUsers = 0;
 		userName = "";
 		userSurname = "";
