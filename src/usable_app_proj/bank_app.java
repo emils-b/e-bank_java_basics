@@ -1,11 +1,13 @@
 package usable_app_proj;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,27 +18,20 @@ public class bank_app {
 	static String userSurname = "";
 	static String password = "";
 	static Scanner scanner = new Scanner(System.in);
-	//static Client client1 = new Client("Jo", "Chi", 150989, 45625);
-	//static Client client2 = new Client("John", "Snow", 160881, 55937);
-	//static Client client3 = new Client("Jef", "White", 170778, 65358);
-	//static Client client4 = new Client("Luis", "Black", 180688, 75411);
-	//static Client client5 = new Client("Ebber", "Berry", 190590, 85529);
-
-	//static Client[] clientArray = { client1, client2, client3, client4, client5 };
+	static String pathToFile = "D:\\Eclipse\\workspace\\usable_app_proj\\client.csv";
 	static ArrayList<Client> clientList = new ArrayList<Client>();
 	
 	public static void main(String[] args) {
-		String pathToFile = "D:\\Eclipse\\workspace\\bank_app\\client.csv";
 		createClientList(pathToFile);
-		clientList.get(0).balance=65;
-		//System.out.println(clientList.get(0).balance);
 		inputChoice();
 	}
 	/*
 	 * Jāizveido, lai nolasa visu tabulu un aizpilda objektam visu informāciju, kura ir tabulā, 
 	 * ne tikai kātagad, ka vārdu, uzvāru un pk abas daļas.
-	 * jāizveido arī tā, ka pie logout saglabā ekseļa tabulā visu no jauna ievadīto objekta info vai arī izmainīto
+	 * pagaidām problēma, ka nevar tā pat ielogoties neizveidojot paroli, pat ja tabulā tā jau ir ievadīta
+	 * kā arī info par vienu lietotāju tiek pārrakstīta secīgi zemāk esošajam
 	 */
+	
 	public static void createClientList(String filePath) {
 		Path pathObject = Paths.get(filePath);
 		Charset charset = Charset.forName("UTF-8");
@@ -46,28 +41,22 @@ public class bank_app {
 				String[] lineArr = lines.get(i).split(SEPARATOR);
 				clientList.add(new Client(lineArr[0],lineArr[1], Integer.parseInt(lineArr[2]), Integer.parseInt(lineArr[3])));
 			}
+		fillClientObj (filePath, lines);
 		} catch (IOException e) {
 			System.out.println(e);
 		}
 	}
 	
-	public static void fillClientObj (String filePath) {
-		Path pathObject = Paths.get(filePath);
-		Charset charset = Charset.forName("UTF-8");
-		try {
-			List<String> lines = Files.readAllLines(pathObject, charset);
-			for (int i=1; i<lines.size(); i++) {
-				String[] lineArr = lines.get(i).split(SEPARATOR);
+	public static void fillClientObj (String filePath, List<String> lines) {
+			for (int i=0; i<lines.size()-1; i++) { 
+				String[] lineArr = lines.get(i+1).split(SEPARATOR);
 				clientList.get(i).password = lineArr[5];
-				clientList.get(i).balance = Integer.parseInt(lineArr[6]); //pars jāuzliek visiem skaitļiem
+				System.out.println(clientList.get(i).password);
+				clientList.get(i).balance = Integer.parseInt(lineArr[6]);
 				clientList.get(i).lastDeposit = Integer.parseInt(lineArr[7]);
 				clientList.get(i).lastWithdrawal = Integer.parseInt(lineArr[8]);
 				//clientList.get(i).transHistLast5 =lineArr[9]; kad aizpildīsies šī šūna exc jāskatās kā to var nolasīt, jo būs jau str masīvs vai pat masīvs nebūs
-				//clientList.add(new Client(lineArr[0],lineArr[1], Integer.parseInt(lineArr[2]), Integer.parseInt(lineArr[3])));
 			}
-		} catch (IOException e) {
-			System.out.println(e);
-		}
 	}
 
 	public static void inputChoice() {
@@ -184,6 +173,7 @@ public class bank_app {
 			if (isUserTrue()) {
 				System.out.println("You are loged in");
 				activeUsers = 1;
+				break;
 			}
 		}
 		if (activeUsers == 0) {
@@ -341,6 +331,7 @@ public class bank_app {
 
 	/*
 	 * jāizveido, ka noapaļo iegūto skaitli abām valūtas konvertēšanas metodēm
+	 * kā arī abām konvertēšanas metodēm ar webskreipingu jāuztaisa, ka iegūst aktuālo info
 	 */
 	public static void fromEurToUsd() {
 		System.out.print("Enter the amount You want to convert from: ");
@@ -390,15 +381,71 @@ public class bank_app {
 		}
 		return isUserTrue;
 	}
-//logout() jāizveido, ka papildina tabulu ar jaunajiem datiem pirms visas pārējās darbības tiek izdarītas
+
 	public static void logout() {
-		//tie ies metode, kas papildina exc tabulu, tikai jāatrod, ka jau esošai var tikai vajadzīgās šūnas papildināt
+		addNewInfo(pathToFile);
 		activeUsers = 0;
 		userName = "";
 		userSurname = "";
 		password = "";
 		System.out.println(userName + userSurname + password);
 		System.out.println("You are loged out");
+	}
+	
+	public static void addNewInfo(String filePath) {
+		try {
+			FileWriter csvWriter = new FileWriter(filePath);
+
+			csvWriter.append("firstName");
+			csvWriter.append(",");
+			csvWriter.append("lastName");
+			csvWriter.append(",");
+			csvWriter.append("pkPart1");
+			csvWriter.append(",");
+			csvWriter.append("pkPart2");
+			csvWriter.append(",");
+			csvWriter.append("id");
+			csvWriter.append(",");
+			csvWriter.append("password");
+			csvWriter.append(",");
+			csvWriter.append("balance");
+			csvWriter.append(",");
+			csvWriter.append("lastDeposite");
+			csvWriter.append(",");
+			csvWriter.append("lastWithdrawal");
+			csvWriter.append(",");
+			csvWriter.append("transHistLast5");
+			csvWriter.append("\n");
+			
+			//vai šo neavar īsāk?
+			for (Client rowData : clientList) {
+				csvWriter.append(rowData.firstName);
+				csvWriter.append(",");
+				csvWriter.append(rowData.lastName);
+				csvWriter.append(",");
+				csvWriter.append(""+rowData.pkPart1);
+				csvWriter.append(",");
+				csvWriter.append(""+rowData.pkPart2);
+				csvWriter.append(",");
+				csvWriter.append(rowData.id);
+				csvWriter.append(",");
+				csvWriter.append(""+rowData.password);
+				csvWriter.append(",");
+				csvWriter.append(""+rowData.balance);
+				csvWriter.append(",");
+				csvWriter.append(""+rowData.lastDeposit);
+				csvWriter.append(",");
+				csvWriter.append(""+rowData.lastWithdrawal);
+				csvWriter.append(",");
+				csvWriter.append(Arrays.toString(rowData.transHistLast5));
+				csvWriter.append("\n");
+			}
+
+			csvWriter.flush();
+			csvWriter.close();
+		} catch (IOException e) {
+			System.out.println(e);
+		}
 	}
 
 }
