@@ -1,5 +1,5 @@
 firstName,lastName,pkPart1,pkPart2,id,password,balance,lastDeposite,lastWithdrawal,transHistLast5,,,,
-Jo,Chi,150989,45625,JO105364HI,pas,130,0,0,[0,0,0,0, 0]
+Jo,Chi,150989,45625,JO105364HI,pas,130,0,0,[1,2,3,4, 5]
 John,Snow,160881,55937,JO104944OW,pas2,0,0,0,[0,0,0,0, 0]
 Jef,White,170778,65358,JE105420TE,pas3,0,0,0,[0,0,0,0, 0]
 Luis,Black,180688,75411,LU105277CK,pas4,0,0,0,[0,0,0,0, 0]

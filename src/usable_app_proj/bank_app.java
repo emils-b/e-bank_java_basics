@@ -55,7 +55,15 @@ public class bank_app {
 				clientList.get(i).balance = Integer.parseInt(lineArr[6]);
 				clientList.get(i).lastDeposit = Integer.parseInt(lineArr[7]);
 				clientList.get(i).lastWithdrawal = Integer.parseInt(lineArr[8]);
-				//clientList.get(i).transHistLast5 =lineArr[9]; kad aizpildīsies šī šūna exc jāskatās kā to var nolasīt, jo būs jau str masīvs vai pat masīvs nebūs
+				int index = 9;
+				for (int j=0; j<clientList.get(i).transHistLast5.length; j++) {
+					if (index==9+clientList.get(i).transHistLast5.length-1) {
+						clientList.get(i).transHistLast5[j]=Integer.parseInt(lineArr[index].substring(1,lineArr[index].length()-1));
+					}
+					else {clientList.get(i).transHistLast5[j]=Integer.parseInt(lineArr[index].substring(lineArr[index].length()-1));
+					}System.out.println(Arrays.toString(clientList.get(i).transHistLast5));
+					index++;
+				}
 			}
 	}
 
