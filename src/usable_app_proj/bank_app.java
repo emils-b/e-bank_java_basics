@@ -115,7 +115,6 @@ public class bank_app {
 			makeWithdraw();
 			break;
 		case 7:
-			//te ir kļūda, tad kad izņem naudu, masīvā aizvietojās visas pozīcijas ar izņemto summu
 			showHistory();
 			break;
 		case 8:
@@ -128,10 +127,6 @@ public class bank_app {
 		scanner.close();
 	}
 
-	/*
-	 * pie šī jāpiestrādā, jāpameklē vai var pievienot šādi jaunu objektu caur
-	 * konsoli pagaidām jātaisa, ka esošam objektam vienkārši izveido paroli
-	 */
 	public static void register() {
 		boolean isAClient = false;
 		System.out.print("Insert your first name: ");
@@ -156,11 +151,6 @@ public class bank_app {
 		scanner.close();
 	}
 
-	/*
-	 * izveidot array ar objektiem un tad loopā iet cauri viesiem objektiem, atrast
-	 * vai tāds vārds ir starp objektiem un vai atbilstošais vārds saskan ar paroli
-	 * tam pašam objektam
-	 */
 	public static void login() {
 		System.out.print("Insert your first name: ");
 		userName = "" + scanner.nextLine();
@@ -183,11 +173,6 @@ public class bank_app {
 		scanner.close();
 	}
 
-	/*
-	 * balstoties uz register() un login() izveidoto vārdu un uzvārdu, atrod īsto
-	 * user array sarakstā un izdrukā tam konta atlikumu jāizveido, ka konta
-	 * atlikums nevar būt negatīvs
-	 */
 	public static void balance() {
 		for (int i = 0; i < clientList.size(); i++) {
 			if (isUserTrue()) {
@@ -227,13 +212,23 @@ public class bank_app {
 				} while (incorrectInput);
 				clientList.get(i).balance += deposit;
 				clientList.get(i).lastDeposit = deposit;
+				System.out.println("Your balance is: " + clientList.get(i).balance);
+				boolean have0 = false;
+				//zemāk esošo daļu liks citā metodē
 				for (int j = 0; j < clientList.get(i).transHistLast5.length; j++) {
 					if (clientList.get(i).transHistLast5[j] == 0) {
 						clientList.get(i).transHistLast5[j] = deposit;
+						have0 = true;
 						break;
-					}
+					} 
 				}
-				System.out.println("Your balance is: " + clientList.get(i).balance);
+				if (!have0) {
+					for (int j=0; j<clientList.get(i).transHistLast5.length-1;j++) {
+						clientList.get(i).transHistLast5[j] = clientList.get(i).transHistLast5[j+1];
+					}
+					clientList.get(i).transHistLast5[clientList.get(i).transHistLast5.length-1] = deposit;
+					
+				}
 				break;
 			}
 		}
@@ -259,23 +254,21 @@ public class bank_app {
 					clientList.get(i).balance -= withdrawal;
 					clientList.get(i).lastWithdrawal = withdrawal;
 					System.out.println("Your balance is: " + clientList.get(i).balance);
+					boolean have0 = false;
+					//zemāk esošo daļu liks citā metodē un jāpielāgo arī, kad pievieno naudu
 					for (int j = 0; j < clientList.get(i).transHistLast5.length; j++) {
 						if (clientList.get(i).transHistLast5[j] == 0) {
 							clientList.get(i).transHistLast5[j] = withdrawal * -1;
+							have0 = true;
 							break;
-							/*zemāk jāizveido, lai gadījumā, kad array ir viss aizņemts (nav 0 vērtības), 
-							pirmā pozīcija tiek aizņemta ar šo darbību un pārējās pabīdītas vienu indexu tālāk un pēdējais izdzēsts
-							visticamāk jāpārveido par atsevišķu metodi un jāievieto arī pie makeDeposit()
-							jāpārbauda vai vispār tā strādā !!!!!!!
-							esošais variants nestrādā
-							*/ 
-						}if (!(clientList.get(i).transHistLast5[j] == 0)) {
-							for (int a=1; a<clientList.get(i).transHistLast5.length-1;a++) {
-								clientList.get(i).transHistLast5[a] = clientList.get(i).transHistLast5[a-1];
-							}
-							clientList.get(i).transHistLast5[0] = withdrawal * -1;
-							
+						} 
+					}
+					if (!have0) {
+						for (int j=0; j<clientList.get(i).transHistLast5.length-1;j++) {
+							clientList.get(i).transHistLast5[j] = clientList.get(i).transHistLast5[j+1];
 						}
+						clientList.get(i).transHistLast5[clientList.get(i).transHistLast5.length-1] = withdrawal * -1;
+						
 					}
 					break;
 				} else {
@@ -392,6 +385,8 @@ public class bank_app {
 		System.out.println("You are loged out");
 	}
 	
+	//viss kas saistīts ar objektu info iegūšanu no tabulas un pēc tam tabulas papildināšana jāpārvieto uz klases mapi
+	//un tad visu izsauks no turienes ar metodi
 	public static void addNewInfo(String filePath) {
 		try {
 			FileWriter csvWriter = new FileWriter(filePath);
