@@ -10,7 +10,7 @@ public class Client {
 	int balance;
 	int lastDeposit;
 	int lastWithdrawal;
-	int[] transHistLast5 = new int[5]; //jāskatās vai šo varēs pēc tam papildināt ar 5 elementiem, jāveido arī, ka vecāku dzēš kā pievieno jaunu
+	int[] transHistLast5 = new int[5];
 	static int clientCount = 0;
 	
 	public Client(String firstName, String lastName, int pkPart1, int pkPart2) {

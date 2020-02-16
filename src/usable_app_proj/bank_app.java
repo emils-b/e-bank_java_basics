@@ -11,6 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 public class bank_app {
 	static final String SEPARATOR = ",";
 	static int activeUsers = 0;
@@ -24,13 +28,8 @@ public class bank_app {
 	public static void main(String[] args) {
 		createClientList(pathToFile);
 		inputChoice();
+		new web_scraping_USD();
 	}
-	/*
-	 * Jāizveido, lai nolasa visu tabulu un aizpilda objektam visu informāciju, kura ir tabulā, 
-	 * ne tikai kātagad, ka vārdu, uzvāru un pk abas daļas.
-	 * pagaidām problēma, ka nevar tā pat ielogoties neizveidojot paroli, pat ja tabulā tā jau ir ievadīta
-	 * kā arī info par vienu lietotāju tiek pārrakstīta secīgi zemāk esošajam
-	 */
 	
 	public static void createClientList(String filePath) {
 		Path pathObject = Paths.get(filePath);
@@ -130,6 +129,10 @@ public class bank_app {
 			break;
 		case 9:
 			logout();
+			break;
+		default:
+			System.out.println("Please enter valid option.");
+			inputChoice();
 			break;
 		}
 		scanner.close();
@@ -347,7 +350,7 @@ public class bank_app {
 				scanner = new Scanner(System.in);
 			}
 		} while (incorectInput);
-		double usd = eur * 1.11;
+		double usd = eur * getCurrentUSD();
 		System.out.print(eur + " EUR is " + usd + " USD\n");
 		inputChoice();
 		scanner.close();
@@ -449,6 +452,25 @@ public class bank_app {
 		} catch (IOException e) {
 			System.out.println(e);
 		}
+	}
+	
+	public static double getCurrentUSD() {
+		Document doc=null;
+		try{
+			doc = Jsoup.connect("https://www.bank.lv/").userAgent("Mozilla/72.0.2").get();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		Elements rows = doc.getElementsByTag("td");
+		double USD = 0;
+		for (int i=0; i<rows.size(); i++) {
+			if (rows.get(i).getElementsByTag("td").first().text().equals("USD")) {
+				USD=Double.parseDouble(rows.get(i+1).getElementsByTag("td").first().text());
+				break;
+			}
+		}
+		return USD;
 	}
 
 }
