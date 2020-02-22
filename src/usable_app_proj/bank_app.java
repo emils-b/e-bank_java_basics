@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class bank_app {
@@ -369,7 +370,7 @@ public class bank_app {
 				scanner = new Scanner(System.in);
 			}
 		} while (incorectInput);
-		double eur = usd * 0.9;
+		double eur = usd * getCurrentEUR();
 		System.out.print(usd + " USD is " + eur + " EUR\n");
 		inputChoice();
 		scanner.close();
@@ -471,6 +472,19 @@ public class bank_app {
 			}
 		}
 		return USD;
+	}
+	
+	public static double getCurrentEUR() {
+		Document doc=null;
+		try{
+			doc = Jsoup.connect("https://www.exchangerates.org.uk/Dollars-to-Euros-currency-conversion-page.html").userAgent("Mozilla/72.0.2").get();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		Element curValEur = doc.getElementById("shd2b;");
+		double EUR=Double.parseDouble(curValEur.getElementsByTag("span").first().text());
+		return EUR;
 	}
 
 }
