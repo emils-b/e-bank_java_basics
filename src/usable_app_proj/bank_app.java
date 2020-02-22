@@ -51,7 +51,6 @@ public class bank_app {
 			for (int i=0; i<lines.size()-1; i++) { 
 				String[] lineArr = lines.get(i+1).split(SEPARATOR);
 				clientList.get(i).password = lineArr[5];
-				System.out.println(clientList.get(i).password);
 				clientList.get(i).balance = Integer.parseInt(lineArr[6]);
 				clientList.get(i).lastDeposit = Integer.parseInt(lineArr[7]);
 				clientList.get(i).lastWithdrawal = Integer.parseInt(lineArr[8]);
@@ -61,7 +60,7 @@ public class bank_app {
 						clientList.get(i).transHistLast5[j]=Integer.parseInt(lineArr[index].substring(1,lineArr[index].length()-1));
 					}
 					else {clientList.get(i).transHistLast5[j]=Integer.parseInt(lineArr[index].substring(lineArr[index].length()-1));
-					}System.out.println(Arrays.toString(clientList.get(i).transHistLast5));
+					}
 					index++;
 				}
 			}
@@ -87,8 +86,6 @@ public class bank_app {
 			System.out.println(" 9 - to to logout");
 		}
 		System.out.println("-------------------------------------");
-		// jāsaliek visām metodēm, kur kaut ko ievada lietotājs, lai izķer erorus,
-		// varbūt, eroru ziņu var pārveidot par metodi...
 		int input = 0;
 		boolean incorectInput = true;
 		do {
@@ -225,22 +222,7 @@ public class bank_app {
 				clientList.get(i).balance += deposit;
 				clientList.get(i).lastDeposit = deposit;
 				System.out.println("Your balance is: " + clientList.get(i).balance);
-				boolean have0 = false;
-				//zemāk esošo daļu liks citā metodē
-				for (int j = 0; j < clientList.get(i).transHistLast5.length; j++) {
-					if (clientList.get(i).transHistLast5[j] == 0) {
-						clientList.get(i).transHistLast5[j] = deposit;
-						have0 = true;
-						break;
-					} 
-				}
-				if (!have0) {
-					for (int j=0; j<clientList.get(i).transHistLast5.length-1;j++) {
-						clientList.get(i).transHistLast5[j] = clientList.get(i).transHistLast5[j+1];
-					}
-					clientList.get(i).transHistLast5[clientList.get(i).transHistLast5.length-1] = deposit;
-					
-				}
+				addToHistory(i, deposit, 1);
 				break;
 			}
 		}
@@ -266,22 +248,7 @@ public class bank_app {
 					clientList.get(i).balance -= withdrawal;
 					clientList.get(i).lastWithdrawal = withdrawal;
 					System.out.println("Your balance is: " + clientList.get(i).balance);
-					boolean have0 = false;
-					//zemāk esošo daļu liks citā metodē un jāpielāgo arī, kad pievieno naudu
-					for (int j = 0; j < clientList.get(i).transHistLast5.length; j++) {
-						if (clientList.get(i).transHistLast5[j] == 0) {
-							clientList.get(i).transHistLast5[j] = withdrawal * -1;
-							have0 = true;
-							break;
-						} 
-					}
-					if (!have0) {
-						for (int j=0; j<clientList.get(i).transHistLast5.length-1;j++) {
-							clientList.get(i).transHistLast5[j] = clientList.get(i).transHistLast5[j+1];
-						}
-						clientList.get(i).transHistLast5[clientList.get(i).transHistLast5.length-1] = withdrawal * -1;
-						
-					}
+					addToHistory(i, withdrawal, -1);
 					break;
 				} else {
 					System.out.println("You can't withdraw such an amount");
@@ -290,6 +257,23 @@ public class bank_app {
 			}
 		}
 		inputChoice();
+	}
+	
+	public static void addToHistory(int i, int amount, int toTurnNegWith) {
+		boolean have0 = false;
+		for (int j = 0; j < clientList.get(i).transHistLast5.length; j++) {
+			if (clientList.get(i).transHistLast5[j] == 0) {
+				clientList.get(i).transHistLast5[j] = amount * toTurnNegWith;
+				have0 = true;
+				break;
+			} 
+		}
+		if (!have0) {
+			for (int j=0; j<clientList.get(i).transHistLast5.length-1;j++) {
+				clientList.get(i).transHistLast5[j] = clientList.get(i).transHistLast5[j+1];
+			}
+			clientList.get(i).transHistLast5[clientList.get(i).transHistLast5.length-1] = amount * toTurnNegWith;
+		}
 	}
 
 	public static void showHistory() {
@@ -330,14 +314,14 @@ public class bank_app {
 		case 2:
 			fromUsdToEur();
 			break;
+		default:
+			System.out.println("Please enter valid option.");
+			convert();
+			break;
 		}
 		scanner.close();
 	}
 
-	/*
-	 * jāizveido, ka noapaļo iegūto skaitli abām valūtas konvertēšanas metodēm
-	 * kā arī abām konvertēšanas metodēm ar webskreipingu jāuztaisa, ka iegūst aktuālo info
-	 */
 	public static void fromEurToUsd() {
 		System.out.print("Enter the amount You want to convert from: ");
 		double eur = 0;
